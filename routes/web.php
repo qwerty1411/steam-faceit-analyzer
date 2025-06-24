@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 Route::get('/', [FaceitController::class, 'index'])->name('faceit.index');
 Route::get('/api/faceit', [FaceitController::class, 'show']);
-
+Route::get('/api/faceit/search', [FaceitController::class, 'searchPlayers']);
 
 //Route::get('/', function () {
 //    return Inertia::render('Welcome', [

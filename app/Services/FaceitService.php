@@ -41,4 +41,18 @@ class FaceitService
             'matches' => $matches['items'] ?? [],
         ];
     }
+
+    public function searchPlayers(string $nickname, int $limit = 5): ?array
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->apiKey
+        ])->get("https://open.faceit.com/data/v4/search/players", [
+            'nickname' => $nickname,
+            'game' => 'cs2',
+            'limit' => $limit
+        ]);
+
+        return $response->successful() ? $response->json() : null;
+    }
+
 }

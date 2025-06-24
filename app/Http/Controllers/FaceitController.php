@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\FaceitService;
 use Inertia\Inertia;
@@ -36,6 +37,22 @@ class FaceitController extends Controller
         }
 
         return response()->json($profile);
+    }
+
+
+    public function searchPlayers(Request $request)
+    {
+        $request->validate([
+            'nickname' => 'required|string|min:2',
+            'limit' => 'sometimes|integer|min:1|max:5'
+        ]);
+
+        $results = $this->faceitService->searchPlayers(
+            $request->input('nickname'),
+            $request->input('limit', 5)
+        );
+
+        return response()->json($results ? $results['items'] : []);
     }
 
 }

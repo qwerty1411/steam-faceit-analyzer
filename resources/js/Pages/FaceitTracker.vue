@@ -64,6 +64,28 @@
                             </button>
                         </div>
                         <p v-if="error" class="text-red-500 mt-2 text-center">{{ error }}</p>
+
+                        <!-- Блок с подсказками поиска -->
+                        <div v-if="searchSuggestions.length > 0 && !profile && !loading" class="mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                            <div v-for="player in searchSuggestions" :key="player.player_id"
+                                 @click="selectSuggestion(player.nickname)"
+                                 class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex items-center">
+                                <img :src="player.avatar" class="w-8 h-8 rounded-full mr-3" alt="avatar">
+                                <div>
+                                    <p class="font-medium dark:text-white">
+                                        {{ player.nickname }} | 
+                                        <img
+                                            :src="`https://flagcdn.com/24x18/${player.country.toLowerCase()}.png`"
+                                            alt="flag"
+                                            class="w-6 h-3 rounded-sm inline-block"
+                                        />
+                                    </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        <span>Уровень: {{ player.games[1]?.skill_level || 'N/A' }}</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -233,6 +255,7 @@
                     <li>Просмотр подробной статистики и последних матчей</li>
                     <li>Тёмная и светлая тема для комфортного использования</li>
                     <li>Топовые игроки и их профили для быстрого доступа</li>
+                    <li>Подсказки при поиске игроков</li>
                 </ul>
                 <h2>Контакты</h2>
                 <p>Если у вас есть вопросы или предложения, пишите на <a href="mailto:huseinnurkhonov16@gmail.com" class="text-blue-600 hover:underline">huseinnurkhonov16@gmail.com</a>.</p>
@@ -259,6 +282,8 @@ const error = ref(null)
 const isDark = ref(false)
 const loading = ref(false)
 const currentPage = ref('home')
+const searchSuggestions = ref([])
+const searchTimeout = ref(null)
 
 onMounted(() => {
     isDark.value = localStorage.getItem('theme') === 'dark'
@@ -269,6 +294,38 @@ watch(isDark, (value) => {
     localStorage.setItem('theme', value ? 'dark' : 'light')
     applyTheme()
 })
+
+// Вотчер для подсказок поиска
+watch(nickname, (newVal) => {
+    if (newVal.trim().length >= 2 && !profile.value) {
+        clearTimeout(searchTimeout.value)
+        searchTimeout.value = setTimeout(() => {
+            fetchSuggestions(newVal.trim())
+        }, 300)
+    } else {
+        searchSuggestions.value = []
+    }
+})
+
+async function fetchSuggestions(query) {
+    if (!query || query.length < 2) return
+
+    try {
+        const response = await axios.get('/api/faceit/search', {
+            params: { nickname: query, limit: 5 }
+        })
+        searchSuggestions.value = response.data || []
+    } catch (e) {
+        console.error('Error fetching suggestions:', e)
+        searchSuggestions.value = []
+    }
+}
+
+function selectSuggestion(nick) {
+    nickname.value = nick
+    searchSuggestions.value = []
+    fetch()
+}
 
 function toggleTheme() {
     isDark.value = !isDark.value
@@ -286,6 +343,7 @@ async function fetch() {
     error.value = null
     profile.value = null
     loading.value = true
+    searchSuggestions.value = []
 
     if (!nickname.value.trim()) {
         error.value = 'Пожалуйста, введите никнейм.'
@@ -307,12 +365,13 @@ async function fetch() {
     }
 }
 
-function reset() {
+function resetAndGoHome() {
     nickname.value = ''
     profile.value = null
     error.value = null
     loading.value = false
     currentPage.value = 'home'
+    searchSuggestions.value = []
 }
 
 const proPlayers = [
@@ -367,5 +426,19 @@ html {
 
 .animate-bounce-slow {
     animation: bounce-slow 3s infinite;
+}
+
+/* Анимация спиннера */
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 </style>
