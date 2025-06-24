@@ -243,8 +243,7 @@
             class="bg-gray-100 dark:bg-gray-800 text-center text-gray-600 dark:text-gray-400 py-6 mt-auto transition-colors duration-300">
             <p>© 2025 Faceit TJ. Все права защищены.</p>
             <p>
-                <a href="mailto:contact@huseinnurkhonov16@gmail.com" class="hover:underline">huseinnurkhonov16@gmail.com</a> |
-                +992935-66-95-14
+                <a href="mailto:contact@huseinnurkhonov16@gmail.com" class="hover:underline">huseinnurkhonov16@gmail.com</a>
             </p>
         </footer>
     </div>
