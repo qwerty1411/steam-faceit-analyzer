@@ -1,0 +1,17 @@
+[0;1;31m×[0m apache2.service - The Apache HTTP Server
+     Loaded: loaded (/lib/systemd/system/apache2.service; enabled; vendor preset: enabled)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Tue 2025-06-24 12:22:20 MSK; 24min ago
+       Docs: https://httpd.apache.org/docs/2.4/
+    Process: 30637 ExecStart=/usr/sbin/apachectl start [0;1;31m(code=exited, status=1/FAILURE)[0m
+        CPU: 33ms
+
+Jun 24 12:22:20 5133537-wf83848 apachectl[30640]: AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 2a03:6f00:a::c716. Set the 'ServerName' directive globally to suppress this message
+Jun 24 12:22:20 5133537-wf83848 apachectl[30640]: (98)Address already in use: AH00072: make_sock: could not bind to address [::]:80
+Jun 24 12:22:20 5133537-wf83848 apachectl[30640]: (98)Address already in use: AH00072: make_sock: could not bind to address 0.0.0.0:80
+Jun 24 12:22:20 5133537-wf83848 apachectl[30640]: no listening sockets available, shutting down
+Jun 24 12:22:20 5133537-wf83848 apachectl[30640]: AH00015: Unable to open logs
+Jun 24 12:22:20 5133537-wf83848 apachectl[30637]: Action 'start' failed.
+Jun 24 12:22:20 5133537-wf83848 apachectl[30637]: The Apache error log may have more information.
+Jun 24 12:22:20 5133537-wf83848 systemd[1]: [0;1;39m[0;1;31m[0;1;39mapache2.service: Control process exited, code=exited, status=1/FAILURE[0m
+Jun 24 12:22:20 5133537-wf83848 systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mapache2.service: Failed with result 'exit-code'.[0m
+Jun 24 12:22:20 5133537-wf83848 systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start The Apache HTTP Server.[0m
