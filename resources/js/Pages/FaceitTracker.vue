@@ -2,7 +2,12 @@
     <div class="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
         <!-- Header -->
         <header class="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="resetAndGoHome">Faceit TJ</h1>
+            <div class="flex items-center space-x-2">
+                <div class="logo" @click="resetAndGoHome">
+                    <div class="logo-inner"></div>
+                </div>
+                <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" @click="resetAndGoHome">Faceit TJ</h1>
+            </div>
             <nav class="space-x-4 text-gray-600 dark:text-gray-300 flex items-center">
                 <a href="#" @click.prevent="currentPage = 'home'" class="hover:text-blue-600 dark:hover:text-blue-400">Главная</a>
                 <a href="#" @click.prevent="currentPage = 'about'" class="hover:text-blue-600 dark:hover:text-blue-400">О сервисе</a>
@@ -73,7 +78,7 @@
                                 <img :src="player.avatar" class="w-8 h-8 rounded-full mr-3" alt="avatar">
                                 <div>
                                     <p class="font-medium dark:text-white">
-                                        {{ player.nickname }} | 
+                                        {{ player.nickname }} |
                                         <img
                                             :src="`https://flagcdn.com/24x18/${player.country.toLowerCase()}.png`"
                                             alt="flag"
@@ -439,6 +444,89 @@ html {
     }
     to {
         transform: rotate(360deg);
+    }
+}
+
+/* Логотип CSS-only */
+.logo {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.logo-inner {
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 4px;
+    position: relative;
+    transform: rotate(45deg);
+}
+
+.logo-inner::before,
+.logo-inner::after {
+    content: '';
+    position: absolute;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.logo-inner::before {
+    width: 8px;
+    height: 8px;
+    top: -4px;
+    left: -4px;
+    border-radius: 50%;
+}
+
+.logo-inner::after {
+    width: 12px;
+    height: 12px;
+    bottom: -6px;
+    right: -6px;
+    border-radius: 50%;
+}
+
+.dark .logo {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+.dark .logo-inner {
+    background: #1f2937;
+}
+
+.dark .logo-inner::before,
+.dark .logo-inner::after {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+/* Анимация логотипа при наведении */
+.logo:hover .logo-inner {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: rotate(45deg) scale(1);
+    }
+    50% {
+        transform: rotate(45deg) scale(1.1);
+    }
+    100% {
+        transform: rotate(45deg) scale(1);
     }
 }
 </style>
