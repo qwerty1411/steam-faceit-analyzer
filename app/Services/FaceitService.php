@@ -32,7 +32,7 @@ class FaceitService
         $matches = Http::withHeaders([
             'Authorization' => 'Bearer ' . $this->apiKey
         ])->get("https://open.faceit.com/data/v4/players/{$player['player_id']}/history", [
-            'game' => 'cs2', 'limit' => 10
+            'game' => 'cs2',
         ])->json();
 
         return [
@@ -41,6 +41,16 @@ class FaceitService
             'matches' => $matches['items'] ?? [],
         ];
     }
+
+    public function getMatch(string $matchId): ?array
+    {
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $this->apiKey
+        ])->get("https://open.faceit.com/data/v4/matches/{$matchId}");
+
+        return $response->successful() ? $response->json() : null;
+    }
+
 
     public function searchPlayers(string $nickname, int $limit = 5): ?array
     {

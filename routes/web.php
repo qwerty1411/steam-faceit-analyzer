@@ -9,6 +9,8 @@ use Inertia\Inertia;
 Route::get('/', [FaceitController::class, 'index'])->name('faceit.index');
 Route::get('/api/faceit', [FaceitController::class, 'show']);
 Route::get('/api/faceit/search', [FaceitController::class, 'searchPlayers']);
+Route::get('/api/matches/{matchId}', [\App\Http\Controllers\FaceitController::class, 'getMatch']);
+
 
 //Route::get('/', function () {
 //    return Inertia::render('Welcome', [

@@ -10,7 +10,8 @@
             </div>
             <nav class="space-x-4 text-gray-600 dark:text-gray-300 flex items-center">
                 <a href="#" @click.prevent="currentPage = 'home'" class="hover:text-blue-600 dark:hover:text-blue-400">Главная</a>
-                <a href="#" @click.prevent="currentPage = 'about'" class="hover:text-blue-600 dark:hover:text-blue-400">О сервисе</a>
+                <a href="#" @click.prevent="currentPage = 'about'" class="hover:text-blue-600 dark:hover:text-blue-400">О
+                    сервисе</a>
                 <a href="#contacts" class="hover:text-blue-600 dark:hover:text-blue-400">Контакты</a>
 
                 <!-- Переключатель темы -->
@@ -71,7 +72,8 @@
                         <p v-if="error" class="text-red-500 mt-2 text-center">{{ error }}</p>
 
                         <!-- Блок с подсказками поиска -->
-                        <div v-if="searchSuggestions.length > 0 && !profile && !loading" class="mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                        <div v-if="searchSuggestions.length > 0 && !profile && !loading"
+                             class="mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
                             <div v-for="player in searchSuggestions" :key="player.player_id"
                                  @click="selectSuggestion(player.nickname)"
                                  class="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer flex items-center">
@@ -86,7 +88,12 @@
                                         />
                                     </p>
                                     <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        <span>Уровень: {{ player.games[1]?.skill_level || 'N/A' }}</span>
+                                        <span>
+                                            Уровень:
+                                            {{
+                                                player.games.find(game => game.name === 'cs2')?.skill_level || 'N/A'
+                                            }}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -139,14 +146,16 @@
                         v-if="!profile && !loading"
                         class="mt-12 mx-auto w-full max-w-5xl bg-white dark:bg-gray-900 rounded-xl shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 transition-colors"
                     >
-                        <div class="flex flex-col md:flex-row items-center justify-between p-6 md:p-8 text-gray-900 dark:text-gray-100">
+                        <div
+                            class="flex flex-col md:flex-row items-center justify-between p-6 md:p-8 text-gray-900 dark:text-gray-100">
                             <!-- Текстовая часть -->
                             <div class="mb-6 md:mb-0 md:w-1/2">
                                 <h2 class="text-2xl font-bold mb-3 text-indigo-700 dark:text-indigo-400">
                                     💼 Открой свой первый кейс бесплатно!
                                 </h2>
                                 <p class="mb-4 text-sm md:text-base text-gray-700 dark:text-gray-300">
-                                    Испытай удачу и получи шанс выбить топовый скин. Лучшие кейсы с бонусами и реферальной системой!
+                                    Испытай удачу и получи шанс выбить топовый скин. Лучшие кейсы с бонусами и
+                                    реферальной системой!
                                 </p>
                                 <a
                                     href="https://yourcasesite.com"
@@ -203,7 +212,9 @@
                             >
                                 Открыть профиль на Faceit
                             </a>
-                            <p class="mt-3">ELO: <strong>{{ profile.profile.games['cs2']?.faceit_elo || 'N/A' }}</strong>
+                            <p class="mt-3">ELO: <strong>{{
+                                    profile.profile.games['cs2']?.faceit_elo || 'N/A'
+                                }}</strong>
                             </p>
                             <p>Уровень: <strong>{{ profile.profile.games['cs2']?.skill_level || 'N/A' }}</strong></p>
                         </div>
@@ -221,16 +232,16 @@
                         <StatCard title="Longest Win Streak" :value="profile.stats.lifetime['Longest Win Streak']"/>
                         <StatCard title="Recent Results">
                             <div class="flex space-x-1 justify-center">
-              <span
-                  v-for="(r, i) in profile.stats.lifetime['Recent Results']"
-                  :key="i"
-                  :class="[
-                  'w-6 h-6 flex items-center justify-center rounded font-bold text-white text-xs',
-                  r === '1' ? 'bg-green-500' : 'bg-red-500'
-                ]"
-              >
-                {{ r === '1' ? 'W' : 'L' }}
-              </span>
+        <span
+            v-for="(r, i) in profile.stats.lifetime['Recent Results']"
+            :key="i"
+            :class="[
+                'w-5 h-5 flex items-center justify-center rounded font-bold text-white text-xs',
+                r === '1' ? 'bg-green-500' : 'bg-red-500'
+            ]"
+        >
+            {{ r === '1' ? 'W' : 'L' }}
+        </span>
                             </div>
                         </StatCard>
                         <StatCard title="Current Win Streak" :value="profile.stats.lifetime['Current Win Streak']"/>
@@ -239,7 +250,7 @@
                     <!-- Таблица матчей -->
                     <div class="mt-10">
                         <h2 class="text-xl font-semibold mb-4 dark:text-white">Последние матчи</h2>
-                        <MatchTable :matches="profile.matches"/>
+                        <MatchTable :matches="profile.matches" :current-player-id="profile.profile.player_id" />
                     </div>
                 </section>
             </template>
@@ -248,11 +259,13 @@
             <section v-if="currentPage === 'about'" class="prose max-w-none dark:text-white">
                 <h1>О сервисе Faceit TJ</h1>
                 <p>
-                    Добро пожаловать на Faceit TJ — сервис, который помогает искать и анализировать статистику игроков Faceit по CS2.
+                    Добро пожаловать на Faceit TJ — сервис, который помогает искать и анализировать статистику игроков
+                    Faceit по CS2.
                     Здесь вы можете быстро узнать уровень игрока, его Эло, выигранные матчи и многое другое.
                 </p>
                 <p>
-                    Мы создали этот сервис, чтобы сделать вашу игру интереснее и помочь найти сильных соперников или партнеров для игры.
+                    Мы создали этот сервис, чтобы сделать вашу игру интереснее и помочь найти сильных соперников или
+                    партнеров для игры.
                 </p>
                 <h2>Функции сервиса</h2>
                 <ul>
@@ -263,7 +276,9 @@
                     <li>Подсказки при поиске игроков</li>
                 </ul>
                 <h2>Контакты</h2>
-                <p>Если у вас есть вопросы или предложения, пишите на <a href="mailto:huseinnurkhonov16@gmail.com" class="text-blue-600 hover:underline">huseinnurkhonov16@gmail.com</a>.</p>
+                <p>Если у вас есть вопросы или предложения, пишите на <a href="mailto:huseinnurkhonov16@gmail.com"
+                                                                         class="text-blue-600 hover:underline">huseinnurkhonov16@gmail.com</a>.
+                </p>
             </section>
         </main>
 
@@ -275,7 +290,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import {ref, onMounted, watch, computed} from 'vue'
 import axios from 'axios'
 
 import StatCard from '@/Components/StatCard.vue'
@@ -317,7 +332,7 @@ async function fetchSuggestions(query) {
 
     try {
         const response = await axios.get('/api/faceit/search', {
-            params: { nickname: query, limit: 5 }
+            params: {nickname: query, limit: 5}
         })
         searchSuggestions.value = response.data || []
     } catch (e) {
@@ -356,7 +371,7 @@ async function fetch() {
         return
     }
     try {
-        const res = await axios.get('/api/faceit', { params: { nickname: nickname.value.trim() } })
+        const res = await axios.get('/api/faceit', {params: {nickname: nickname.value.trim()}})
         if (!res.data || res.data.error) {
             error.value = res.data?.error || 'Игрок не найден'
             loading.value = false

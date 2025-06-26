@@ -40,6 +40,15 @@ class FaceitController extends Controller
     }
 
 
+    public function getMatch(string $matchId, FaceitService $faceitService): JsonResponse
+    {
+        $match = $faceitService->getMatch($matchId);
+
+        return $match
+            ? response()->json($match)
+            : response()->json(['error' => 'Матч не найден'], 404);
+    }
+
     public function searchPlayers(Request $request)
     {
         $request->validate([
