@@ -38,6 +38,7 @@
                         </svg>
                     </template>
                 </button>
+                <FaceitLogin/>
             </nav>
         </header>
 
@@ -295,6 +296,7 @@ import axios from 'axios'
 
 import StatCard from '@/Components/StatCard.vue'
 import MatchTable from '@/Components/MatchTable.vue'
+import FaceitLogin from "@/Components/FaceitLogin.vue";
 
 const nickname = ref('')
 const profile = ref(null)
