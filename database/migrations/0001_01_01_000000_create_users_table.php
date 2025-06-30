@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique();
+            // Email может быть отсутствовать для Faceit-only аккаунтов
+            $table->string('email')->nullable()->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            // Пароль необязателен при входе через Faceit
+            $table->string('password')->nullable();
             $table->rememberToken();
 
-            // Faceit integration fields
+            // Поля для интеграции с Faceit
             $table->string('faceit_id')->nullable()->unique();
             $table->string('faceit_nickname')->nullable();
             $table->string('faceit_avatar')->nullable();
