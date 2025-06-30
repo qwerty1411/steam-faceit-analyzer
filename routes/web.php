@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\FaceitController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
@@ -12,8 +13,8 @@ Route::get('/api/faceit', [FaceitController::class, 'show']);
 Route::get('/api/faceit/search', [FaceitController::class, 'searchPlayers']);
 Route::get('/api/matches/{matchId}', [\App\Http\Controllers\FaceitController::class, 'getMatch']);
 
-Route::get('/auth/faceit', [\App\Http\Controllers\Auth\LoginController::class, 'redirectToFaceit']);
-Route::get('/auth/faceit/callback', [\App\Http\Controllers\Auth\LoginController::class, 'handleFaceitCallback']);
+Route::get('/auth/faceit', [LoginController::class, 'redirectToFaceit']);
+Route::get('/auth/faceit/callback', [LoginController::class, 'handleFaceitCallback']);
 Route::get('/auth/faceit/redirect', [LoginController::class, 'redirectToFaceit']);
 
 Route::post('/store-pkce-verifier', function (Request $request) {

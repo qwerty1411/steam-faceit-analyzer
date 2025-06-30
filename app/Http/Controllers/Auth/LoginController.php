@@ -34,7 +34,7 @@ class LoginController extends Controller
             'response_type'         => 'code',
             'client_id'             => config('services.faceit.client_id'),
             'redirect_uri'          => config('services.faceit.redirect_uri'),
-            'scope'                 => 'openid profile',
+            'scope'                 => 'openid email profile',
             'state'                 => $state,
             'code_challenge'        => $challenge,
             'code_challenge_method' => 'S256',
@@ -57,9 +57,10 @@ class LoginController extends Controller
 
         $verifier = $request->session()->pull('faceit.pkce_verifier');
 
-        // Exchange code for tokens
-        $basicRaw = config('services.faceit.client_id') . ':' . config('services.faceit.client_secret');
-        $basic    = rtrim(strtr(base64_encode($basicRaw), '+/', '-_'), '=');
+        // Правильный Basic Auth
+        $basic = base64_encode(
+            config('services.faceit.client_id') . ':' . config('services.faceit.client_secret')
+        );
 
         $tokenResponse = Http::withHeaders([
             'Authorization' => "Basic {$basic}",
@@ -77,13 +78,13 @@ class LoginController extends Controller
             return response()->json($tokenResponse->json(), $tokenResponse->status());
         }
 
-        $tokenData = $tokenResponse->json();
+        $tokenData    = $tokenResponse->json();
         $accessToken  = $tokenData['access_token'];
         $refreshToken = $tokenData['refresh_token'] ?? null;
 
-        // Fetch user info from Faceit
+        // Правильный URL для userinfo
         $userResponse = Http::withToken($accessToken)
-            ->get('https://api.faceit.com/auth/v1/userinfo');
+            ->get('https://api.faceit.com/auth/v1/resources/userinfo');
 
         if (!$userResponse->successful()) {
             return response('Error fetching user info', 500);
@@ -91,11 +92,11 @@ class LoginController extends Controller
 
         $faceitUser = $userResponse->json();
 
-        // Persist to local DB (update or create)
+        // Сохраняем или обновляем локально
         $localUser = User::updateOrCreate(
-            ['faceit_id' => $faceitUser['player_id'] ?? $faceitUser['sub'] ?? null],
+            ['faceit_id' => $faceitUser['sub'] ?? $faceitUser['guid'] ?? null],
             [
-                'name'                 => $faceitUser['nickname'] ?? null,
+                'name'                 => $faceitUser['name'] ?? $faceitUser['nickname'] ?? null,
                 'faceit_nickname'      => $faceitUser['nickname'] ?? null,
                 'faceit_avatar'        => $faceitUser['avatar'] ?? null,
                 'faceit_access_token'  => $accessToken,
@@ -103,10 +104,8 @@ class LoginController extends Controller
             ]
         );
 
-        // Log the user in
         Auth::login($localUser);
 
-        // Redirect to intended page or home
         return redirect()->intended('/');
     }
 }
