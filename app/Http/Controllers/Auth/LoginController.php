@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -16,11 +17,11 @@ class LoginController extends Controller
      */
     public function redirectToFaceit(Request $request)
     {
-        $state    = Str::random(40);
+        $state = Str::random(40);
         $verifier = Str::random(64);
 
         $request->session()->put([
-            'faceit.oauth_state'   => $state,
+            'faceit.oauth_state' => $state,
             'faceit.pkce_verifier' => $verifier,
         ]);
 
@@ -31,12 +32,12 @@ class LoginController extends Controller
         );
 
         $query = http_build_query([
-            'response_type'         => 'code',
-            'client_id'             => config('services.faceit.client_id'),
-            'redirect_uri'          => config('services.faceit.redirect_uri'),
-            'scope'                 => 'openid email profile',
-            'state'                 => $state,
-            'code_challenge'        => $challenge,
+            'response_type' => 'code',
+            'client_id' => config('services.faceit.client_id'),
+            'redirect_uri' => config('services.faceit.redirect_uri'),
+            'scope' => 'openid email profile',
+            'state' => $state,
+            'code_challenge' => $challenge,
             'code_challenge_method' => 'S256',
         ]);
 
@@ -48,7 +49,7 @@ class LoginController extends Controller
      */
     public function handleFaceitCallback(Request $request)
     {
-        $code  = $request->input('code');
+        $code = $request->input('code');
         $state = $request->input('state');
 
         if (!$code || $state !== $request->session()->pull('faceit.oauth_state')) {
@@ -57,49 +58,63 @@ class LoginController extends Controller
 
         $verifier = $request->session()->pull('faceit.pkce_verifier');
 
-        // Правильный Basic Auth
+        // Правильный Basic Auth (обычный Base64)
         $basic = base64_encode(
             config('services.faceit.client_id') . ':' . config('services.faceit.client_secret')
         );
 
+        // Обмен code на токены
         $tokenResponse = Http::withHeaders([
             'Authorization' => "Basic {$basic}",
-            'Content-Type'  => 'application/x-www-form-urlencoded',
+            'Content-Type' => 'application/x-www-form-urlencoded',
         ])
             ->asForm()
             ->post('https://api.faceit.com/auth/v1/oauth/token', [
-                'grant_type'    => 'authorization_code',
-                'code'          => $code,
-                'redirect_uri'  => config('services.faceit.redirect_uri'),
+                'grant_type' => 'authorization_code',
+                'code' => $code,
+                'redirect_uri' => config('services.faceit.redirect_uri'),
                 'code_verifier' => $verifier,
             ]);
 
         if (!$tokenResponse->successful()) {
+            Log::error('Faceit token error', $tokenResponse->json());
             return response()->json($tokenResponse->json(), $tokenResponse->status());
         }
 
-        $tokenData    = $tokenResponse->json();
-        $accessToken  = $tokenData['access_token'];
+        $tokenData = $tokenResponse->json();
+        $accessToken = $tokenData['access_token'];
         $refreshToken = $tokenData['refresh_token'] ?? null;
 
-        // Правильный URL для userinfo
+        // Получаем профиль пользователя
         $userResponse = Http::withToken($accessToken)
             ->get('https://api.faceit.com/auth/v1/resources/userinfo');
 
         if (!$userResponse->successful()) {
+            Log::error('Faceit userinfo error', ['status' => $userResponse->status(), 'body' => $userResponse->body()]);
             return response('Error fetching user info', 500);
         }
 
         $faceitUser = $userResponse->json();
+        Log::debug('FACEIT userinfo:', $faceitUser);
 
-        // Сохраняем или обновляем локально
+        // Маппинг полей из ответа
+        $faceitId = $faceitUser['guid'] ?? null;
+        $name = $faceitUser['name'] ?? null;
+        $email = $faceitUser['email'] ?? null;
+        $avatar = $faceitUser['picture'] ?? null;
+        $nickname = $faceitUser['nickname']
+            ?? $faceitUser['preferred_username']
+            ?? $name;
+
+        // Сохраняем или обновляем локального пользователя
         $localUser = User::updateOrCreate(
-            ['faceit_id' => $faceitUser['sub'] ?? $faceitUser['guid'] ?? null],
+            ['faceit_id' => $faceitId],
             [
-                'name'                 => $faceitUser['name'] ?? $faceitUser['nickname'] ?? null,
-                'faceit_nickname'      => $faceitUser['nickname'] ?? null,
-                'faceit_avatar'        => $faceitUser['avatar'] ?? null,
-                'faceit_access_token'  => $accessToken,
+                'name' => $name,
+                'email' => $email,
+                'faceit_nickname' => $nickname,
+                'faceit_avatar' => $avatar,
+                'faceit_access_token' => $accessToken,
                 'faceit_refresh_token' => $refreshToken,
             ]
         );
