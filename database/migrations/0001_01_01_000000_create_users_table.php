@@ -18,6 +18,14 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+
+            // Faceit integration fields
+            $table->string('faceit_id')->nullable()->unique()->after('remember_token');
+            $table->string('faceit_nickname')->nullable()->after('faceit_id');
+            $table->string('faceit_avatar')->nullable()->after('faceit_nickname');
+            $table->text('faceit_access_token')->nullable()->after('faceit_avatar');
+            $table->text('faceit_refresh_token')->nullable()->after('faceit_access_token');
+
             $table->timestamps();
         });
 
@@ -42,8 +50,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('users');
     }
 };
