@@ -99,7 +99,7 @@ class LoginController extends Controller
 
         // Маппинг полей из ответа
         $faceitId = $faceitUser['guid'] ?? null;
-        $name = $faceitUser['name'] ?? null;
+        $name = $faceitUser['given_name'] ?? null;
         $email = $faceitUser['email'] ?? null;
         $avatar = $faceitUser['picture'] ?? null;
         $nickname = $faceitUser['nickname']
