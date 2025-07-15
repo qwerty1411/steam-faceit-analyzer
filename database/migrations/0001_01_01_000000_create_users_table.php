@@ -27,7 +27,9 @@ return new class extends Migration
             $table->string('faceit_avatar')->nullable();
             $table->text('faceit_access_token')->nullable();
             $table->text('faceit_refresh_token')->nullable();
-
+            $table->string('steam_id')->unique()->nullable();
+            $table->string('steam_avatar')->nullable();
+            $table->decimal('hours_in_cs2', 6, 1)->default(0);
             $table->timestamps();
         });
 

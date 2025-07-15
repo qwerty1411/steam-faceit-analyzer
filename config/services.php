@@ -42,4 +42,8 @@ return [
         'redirect' => env('FACEIT_REDIRECT_URI'),
     ],
 
+    'steam' => [
+        'redirect' => env('STEAM_REDIRECT_URI'),
+    ]
+
 ];

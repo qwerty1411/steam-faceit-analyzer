@@ -38,7 +38,7 @@
                         </svg>
                     </template>
                 </button>
-                <FaceitLogin/>
+                <SteamLogin/>
             </nav>
         </header>
 
@@ -296,7 +296,7 @@ import axios from 'axios'
 
 import StatCard from '@/Components/StatCard.vue'
 import MatchTable from '@/Components/MatchTable.vue'
-import FaceitLogin from "@/Components/FaceitLogin.vue";
+import SteamLogin from "@/Components/SteamLogin.vue";
 
 const nickname = ref('')
 const profile = ref(null)
